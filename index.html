@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventario Demo</title>
+</head>
+<body>
+  <h1>Inventario Demo</h1>
+
+  <section>
+    <h2>Cargar productos</h2>
+    <button id="loadProductsBtn">Ver todos los productos</button>
+    <pre id="productsOutput"></pre>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Buscar producto por ID</h2>
+    <input type="number" id="productIdInput" placeholder="Ingresa un ID" />
+    <button id="findProductBtn">Buscar producto</button>
+    <pre id="singleProductOutput"></pre>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Crear producto</h2>
+    <form id="productForm">
+      <div>
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" />
+      </div>
+      <br />
+      <div>
+        <label for="quantity">Cantidad:</label>
+        <input type="text" id="quantity" />
+      </div>
+      <br />
+      <button type="submit">Crear producto</button>
+    </form>
+
+    <pre id="createProductOutput"></pre>
+  </section>
+
+  <script>
+    const productsOutput = document.getElementById('productsOutput');
+    const singleProductOutput = document.getElementById('singleProductOutput');
+    const createProductOutput = document.getElementById('createProductOutput');
+
+    document.getElementById('loadProductsBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/products');
+        const data = await response.json();
+        productsOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        productsOutput.textContent = 'Error al cargar productos';
+        console.error(error);
+      }
+    });
+
+    document.getElementById('findProductBtn').addEventListener('click', async () => {
+      const id = document.getElementById('productIdInput').value;
+
+      if (!id) {
+        singleProductOutput.textContent = 'Ingresa un ID';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/products/${id}`);
+
+        if (!response.ok) {
+          const text = await response.text();
+          singleProductOutput.textContent = text;
+          return;
+        }
+
+        const data = await response.json();
+        singleProductOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        singleProductOutput.textContent = 'Error al buscar producto';
+        console.error(error);
+      }
+    });
+
+    document.getElementById('productForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const quantity = document.getElementById('quantity').value;
+
+      try {
+        const response = await fetch('/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, quantity })
+        });
+
+        const data = await response.json();
+        createProductOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        createProductOutput.textContent = 'Error al crear producto';
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
