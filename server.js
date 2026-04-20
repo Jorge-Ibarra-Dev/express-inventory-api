@@ -23,8 +23,15 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/products', (req, res) => {
-  throw new Error('Prueba de error');
+const TEST_ERROR = false; // cámbialo a true para probar el middleware
+
+app.get('/products', (req, res, next) => {
+  // 🔥 simulación de error
+  if (TEST_ERROR) {
+    return next(new Error('Prueba de error en GET /products'));
+  }
+
+  res.json(products);
 });
 
 app.get('/products/:id', (req, res) => {
