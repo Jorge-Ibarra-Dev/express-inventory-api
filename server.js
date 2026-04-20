@@ -23,10 +23,9 @@ app.use((req, res, next) => {
 });
 
 
-const TEST_ERROR = false; // cámbialo a true para probar el middleware
+const TEST_ERROR = false;
 
 app.get('/products', (req, res, next) => {
-  // 🔥 simulación de error
   if (TEST_ERROR) {
     return next(new Error('Prueba de error en GET /products'));
   }
@@ -51,25 +50,21 @@ app.post('/products', (req, res) => {
 
   const { name, quantity } = req.body;
 
-  // 🔴 Validar nombre
   if (!name || typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ error: 'El nombre es obligatorio' });
   }
 
-  // 🔴 Validar que quantity exista
   if (quantity === undefined || quantity === '') {
     return res.status(400).json({ error: 'La cantidad es obligatoria' });
   }
 
-  // 🔴 Convertir a número
   const parsedQuantity = Number(quantity);
 
-  // 🔴 Validar que sea número
   if (Number.isNaN(parsedQuantity)) {
     return res.status(400).json({ error: 'La cantidad debe ser numérica' });
   }
 
-  // 🔴 Validar que no sea negativa
+ 
   if (parsedQuantity < 0) {
     return res.status(400).json({ error: 'La cantidad no puede ser negativa' });
   }
@@ -86,7 +81,7 @@ app.post('/products', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error('ERROR:', err); // log del error
+  console.error('ERROR:', err); 
 
   res.status(500).json({
     error: 'Error interno del servidor'
